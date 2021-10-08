@@ -1,60 +1,62 @@
 package com.example.school.controllers;
 
 import com.example.school.actions.UserAction;
+import com.example.school.model.Role;
 import com.example.school.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
+@RequestMapping(path = "/user")
 public class UserController {
-@Autowired
-private UserAction userAction;
+    @Autowired
+    private UserAction userAction;
 
-
-    @GetMapping(path = "/")
-    public String home(Map<String, Object> model){
-        return "index";
+    @GetMapping
+    public String userList(Model model) {
+        Iterable<User> users = userAction.findAll();
+        model.addAttribute("users", users);
+        return "userList";
     }
 
-    @GetMapping(path = "/main")
-    public String main(
-            @RequestParam(name = "name", required = false, defaultValue = "World") String name,
-            Model model
+      @GetMapping("{user}")
+    public String userEditForm(@PathVariable User user, Model model){
+        model.addAttribute("user", user);
+        model.addAttribute("roles", Role.values());
+        return "userEdit";
+    }
+
+    @PostMapping
+    public String userSave(
+            @RequestParam("id") User user,
+            @RequestParam String username,
+            @RequestParam Map<String, String> form
+
     ) {
-        model.addAttribute("name", name);
-        return "main";
-    }
+        user.setUsername(username);
 
-    @GetMapping(path = "/admin")
-    public String admin(Map<String, Object> model) {
-        Iterable<User> users = userAction.findAll();
-        model.put("users", users);
-        return "admin";
-    }
-    @PostMapping(path = "/admin")
-    public String add(@RequestParam String email, @RequestParam String first_name,
-                      Map<String, Object> model){
-        User user = new User(email, first_name);
+        Set<String> roles = Arrays.stream(Role.values())
+                .map(Role::name)
+                .collect(Collectors.toSet());
+
+        user.getRoles().clear();
+
+        for (String key : form.keySet()) {
+            if (roles.contains(key)) {
+                user.getRoles().add(Role.valueOf(key));
+            }
+        }
+
         userAction.save(user);
-        Iterable<User> users = userAction.findAll();
-        model.put("users", users);
-        return "admin";
-    }
 
-
-    @PostMapping("filter")
-    public String filter(@RequestParam String filter, Map<String, Object> model) {
-        List<User> users = userAction.findByEmail(filter);
-        model.put("users", users);
-        return "admin";
+        return "redirect:/user";
     }
 
 }
-
-
-

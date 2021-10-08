@@ -1,5 +1,5 @@
 package com.example.school.model;
 
 public enum Role {
-    USER;
+    USER, ADMIN;
 }

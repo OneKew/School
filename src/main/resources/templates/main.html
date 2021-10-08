@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
-<html  xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:th="https://www.thymeleaf.org"
-       xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">>
+<html   LANG="ru"
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Main</title>
@@ -12,6 +12,7 @@
 <form th:action="@{/logout}" method="post">
     <input type="submit" value="Sign Out"/>
 </form>
-<a href="admin">Админ</a>
+<a href = "course">Курсы</a>
+<a href = "admin">Админ</a>
 </body>
 </html>

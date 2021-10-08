@@ -1,11 +1,8 @@
 package com.example.school.actions;
 
 import com.example.school.model.User;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
-public interface UserAction extends CrudRepository<User, Long> {
-
-    List<User> findByEmail(String email);
+public interface UserAction extends JpaRepository<User, Long> {
+    User findByUsername(String username);
 }
