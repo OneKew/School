@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет</title>
+</head>
+<body>
+<h1>Личные Данные</h1>
+<br>
+<form th:action="@{/profile}" th:object="${usr}" method="post">
+    <input type="hidden" th:field="*{id}" th:value="*{id}" />
+    <input type="text" th:field="*{username}" th:value="*{username}" />
+   <!-- <input type="text" th:field="*{userInfo.first_name}" th:value="*{userInfo.getFirst_name()}"> -->
+    <button type="submit">Save</button>
+</form>
+</body>
+</html>

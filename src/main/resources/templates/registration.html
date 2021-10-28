@@ -7,8 +7,14 @@
 <body>
 <div>Add New User</div>
 <form th:action="@{/registration}" method="post">
-    <div><label> User Name : <input type="text" name="username"/> </label></div>
+    <div><label> Email : <input type="text" name="username"/> </label></div>
     <div><label> Password: <input type="password" name="password"/> </label></div>
+    <div><label> Phone Number: <input type="text" name="phone_number"/> </label></div>
+    <div><label> First Name: <input type="text" name="first_name"/> </label></div>
+    <div><label> Second Name: <input type="text" name="second_name"/> </label></div>
+    <div><label> Surname: <input type="text" name="surname"/> </label></div>
+    <div><label> Birth Date: <input type="text" name="birth_date"/> </label></div>
+
     <div><input type="submit" value="Register"/></div>
 </form>
 <p th:utext="${message}"></p>

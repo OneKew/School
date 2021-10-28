@@ -1,25 +1,20 @@
-<html lang="ru"
-      xmlns:th="https://www.thymeleaf.org">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head >
     <meta charset=UTF-8 />
     <title>Courses</title>
 </head>
 <body>
-  <div>
-      <form th:action="@{/course}" th:object="${courses}" method="POST">
-          <input type="text" th:field="*{name}" />
-          <input type="text" th:field="*{tag}" />
-          <button type="submit">Добавить</button>
-      </form>
+<div>
+    <form th:action="@{/course}" th:object="${course}" method="POST">
+        <input type="text" th:field="*{name}" />
+        <input type="text" th:field="*{tag}" />
+        <button type="submit">Добавить</button>
+    </form>
+</div>
+<div>Список Курсов</div>
+<br>
 
-  </div>
-  <div>Список Курсов</div>
-  <br>
-
-<form method="post" action="@{filter}">
-      <input type="text" th:field="@{filter}">
-      <button type="submit">Найти</button>
-  </form>
   <table class="table">
       <thead>
       <td>Id</td>
@@ -27,12 +22,11 @@
       <td>Tag</td>
       </thead>
       <tbody>
-      <tr th:each ="cr : ${courses}">
-          <td th:utext="${cr.id}"></td>
-          <td th:utext="${cr.name}"></td>
-          <td th:utext="${cr.tag}"></td>
-
-      </tr>
+          <tr th:each="cr : ${courses}">
+              <td th:utext="${cr.getName()}"></td>
+              <td th:utext="${cr.getTag()}"></td>
+              <td><a th:href="@{/course/{id}(id=${cr.getId()})}">edit</a></td>
+          </tr>
       </tbody>
   </table>
 

@@ -5,7 +5,7 @@
     <title>User Editor</title>
 </head>
 <body>
-<form th:action="@{/user}" th:object="${user}" method="post">
+<form th:action="@{/user}" th:object="${usr}" method="post">
     <input type="hidden" th:field="*{id}" th:value="*{id}" />
     <input type="text" th:field="*{username}" th:value="*{username}" />
     <ul>
@@ -16,6 +16,7 @@
     </ul>
     <button type="submit">Save</button>
 </form>
+
 
 </body>
 </html>

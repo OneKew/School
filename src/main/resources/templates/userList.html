@@ -11,17 +11,29 @@
 <table class="table">
     <thead>
         <td>Id</td>
-        <td>Name</td>
+        <td>UserName</td>
+        <td>Email</td>
+        <td>Surname</td>
+        <td>First Name</td>
+        <td>Second Name</td>
+        <td>Phone Number</td>
+        <td>Birth Date</td>
         <td>Role</td>
     </thead>
     <tbody>
-    <tr th:each ="usr : ${users}">
+    <tr th:each ="usr : ${users}" >
         <td th:utext="${usr.id}"></td>
         <td th:utext="${usr.username}"></td>
+        <td th:utext="${usr?.userInfo?.getEmail()}"></td>
+        <td th:utext="${usr?.userInfo?.getSurname()}"></td>
+        <td th:utext="${usr?.userInfo?.getFirst_name()}"></td>
+        <td th:utext="${usr?.userInfo?.getSecond_name()}"></td>
+        <td th:utext="${usr?.userInfo?.getPhone_number()}"></td>
+        <td th:utext="${usr?.userInfo?.getBirth_date()}"></td>
         <td th:each ="roles : ${usr.roles}">
-            <p th:utext="${roles}"></p>
+            <p th:utext="${roles}"></p><br>
         </td>
-        <td><a th:href="@{/user/{id}(id=${usr.id})}">edit</a></td>
+        <td><a th:href="@{/user/{id}(id=${usr.getId()})}">edit</a></td>
     </tr>
     </tbody>
 </table>

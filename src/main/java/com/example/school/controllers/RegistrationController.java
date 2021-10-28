@@ -4,6 +4,7 @@ package com.example.school.controllers;
 import com.example.school.actions.UserAction;
 import com.example.school.model.Role;
 import com.example.school.model.User;
+import com.example.school.model.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,7 +24,7 @@ public class RegistrationController {
     }
 
     @PostMapping(path = "/registration")
-    public String addUser(User user, Model model){
+    public String addUser(User user, UserInfo userInfo, Model model){
         User userFromDb = userAction.findByUsername(user.getUsername());
         if (userFromDb != null){
             model.addAttribute("message", "User exists!");
@@ -32,6 +33,8 @@ public class RegistrationController {
         else {
             user.setActive(true);
             user.setRoles(Collections.singleton(Role.USER));
+            user.setUserInfo(userInfo);
+            user.getUserInfo().setEmail(user.getUsername());
             userAction.save(user);
             return "redirect:/login";
         }

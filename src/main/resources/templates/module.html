@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Modules</title>
+</head>
+<body>
+<div>Название курса</div>
+<p th:text="${course.getName()}">VALUE</p>
+<p th:text="${course.getTag()}">VALUE</p>
+<div>Названия модулей</div>
+<table>
+    <tr th:each="md : ${modules}">
+        <td th:utext="${md.getName()}"></td>
+        <td><a th:href="@{/course/{c_id}/{m_id}(c_id=${course.getId()}, m_id=${md.getId()})}">edit Module</a></td>
+    </tr>
+</table>
+
+ <form th:action="@{/course/{id}(id = ${course.getId()})}" th:object="${module}" method="POST">
+        <input type="text" th:field="*{name}" />
+        <button type="submit">Добавить</button>
+    </form>
+</body>
+</html>

@@ -1,6 +1,8 @@
 package com.example.school.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Module {
@@ -9,10 +11,22 @@ public class Module {
     private Long id;
     @Column
     private String name;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "course_id")
+    private Course course;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "module")
+    private List<Lesson> lessons = new ArrayList<Lesson>();
 
     public Module() {
+    }
 
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
     }
 
     public String getName() {
@@ -21,6 +35,26 @@ public class Module {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public List<Lesson> getLessons() {
+        return lessons;
+    }
+
+    public void setLesson(Lesson lesson) {
+        this.lessons.add(lesson);
+    }
+
+    public void setLessons(List<Lesson> lessons) {
+        this.lessons = lessons;
     }
 }
 

@@ -1,5 +1,6 @@
 package com.example.school.controllers;
 
+
 import com.example.school.model.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -7,28 +8,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.Map;
-
 @Controller
-public class MainController {
+public class ProfileController {
 
-
-    @GetMapping(path = "/")
-    public String index(Map<String, Object> model){
-        return "index";
+    @GetMapping(path = "/profile")
+    public String profile(@ModelAttribute("usr") User user, Model model) {
+        model.addAttribute("usr", user );
+        return "profile";
     }
+    @PostMapping("/profile")
+    public String userProfile(@ModelAttribute("usr") User user){
 
-    @GetMapping(path = "/main")
-    public String main() {
-        return "main";
+        return "profile";
     }
-
-    @GetMapping(path = "/admin")
-    public String admin(){
-        return "admin";
-    }
-
-
-
-
 }
