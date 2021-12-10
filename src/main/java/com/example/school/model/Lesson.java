@@ -2,6 +2,7 @@ package com.example.school.model;
 import org.springframework.ui.Model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 public class Lesson {
@@ -9,14 +10,18 @@ public class Lesson {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column
+    @NotEmpty(message = "Пожалуйста, заполните поле")
     private String name;
-    @Column
+    @Column (length = 1024)
     private String lesson_header;
-    @Column
+    @Column (length = 10240)
     private String lesson_text;
     @Column
     private String lesson_video;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {  CascadeType.DETACH,
+            CascadeType.MERGE,
+            CascadeType.PERSIST,
+            CascadeType.REFRESH})
     @JoinColumn(name = "module_id")
     private Module module;
 
@@ -28,14 +33,6 @@ public class Lesson {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getLesson_video() {
-        return lesson_video;
-    }
-
-    public void setLesson_video(String lesson_video) {
-        this.lesson_video = lesson_video;
     }
 
     public String getName() {
@@ -60,6 +57,14 @@ public class Lesson {
 
     public void setLesson_text(String lesson_text) {
         this.lesson_text = lesson_text;
+    }
+
+    public String getLesson_video() {
+        return lesson_video;
+    }
+
+    public void setLesson_video(String lesson_video) {
+        this.lesson_video = lesson_video;
     }
 
     public Module getModule() {

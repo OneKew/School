@@ -1,6 +1,7 @@
 package com.example.school.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,8 +11,12 @@ public class Module {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column
+    @NotEmpty(message = "Пожалуйста, заполните поле")
     private String name;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {  CascadeType.DETACH,
+                            CascadeType.MERGE,
+                            CascadeType.PERSIST,
+                            CascadeType.REFRESH})
     @JoinColumn(name = "course_id")
     private Course course;
 

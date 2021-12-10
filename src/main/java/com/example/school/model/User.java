@@ -1,10 +1,14 @@
 package com.example.school.model;
 
+import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -15,9 +19,14 @@ public class User implements UserDetails {
     @Column
     private Long id;
     @Column
+    @NotEmpty(message = "Пожалуйста, введите.")
     private String username;
     @Column
+    @NotEmpty(message = "Пожалуйста, заполните поле.")
     private String password;
+    @Transient
+    @NotBlank(message = "Повторите введеннный пароль.")
+    private String password_confirmation;
     @Column
     private boolean active;
     @OneToOne(cascade = CascadeType.ALL)
@@ -25,14 +34,21 @@ public class User implements UserDetails {
     private UserInfo userInfo;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @CollectionTable(name="user_role", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_courses",
+            joinColumns = {@JoinColumn(name = "student_id")},
+            inverseJoinColumns = {@JoinColumn(name = "course_id")}
+    )
+    private Set<Course> subscriptions = new HashSet<>();
+
+
     public User() {
     }
-
-
 
     public Long getId() {
         return id;
@@ -66,6 +82,13 @@ public class User implements UserDetails {
         return isActive();
     }
 
+    public Set<Course> getSubscriptions() {
+        return subscriptions;
+    }
+
+    public void setSubscriptions(Set<Course> subscriptions) {
+        this.subscriptions = subscriptions;
+    }
 
     public void setUsername(String username) {
         this.username = username;
@@ -73,7 +96,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return getRoles();
     }
 
     public String getPassword() {
@@ -106,5 +129,13 @@ public class User implements UserDetails {
 
     public void setUserInfo(UserInfo userInfo) {
         this.userInfo = userInfo;
+    }
+
+    public String getPassword_confirmation() {
+        return password_confirmation;
+    }
+
+    public void setPassword_confirmation(String password_confirmation) {
+        this.password_confirmation = password_confirmation;
     }
 }

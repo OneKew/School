@@ -6,68 +6,140 @@ import com.example.school.actions.ModuleAction;
 import com.example.school.model.Course;
 import com.example.school.model.Lesson;
 import com.example.school.model.Module;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.school.model.User;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/course")
 public class CourseController {
-    @Autowired
+    final
     CourseAction courseAction;
-    @Autowired
+    final
     ModuleAction moduleAction;
-    @Autowired
+    final
     LessonAction lessonAction;
 
-    @GetMapping()
+    public CourseController(CourseAction courseAction, ModuleAction moduleAction, LessonAction lessonAction) {
+        this.courseAction = courseAction;
+        this.moduleAction = moduleAction;
+        this.lessonAction = lessonAction;
+    }
+
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @GetMapping("/course")
     public String course(Model model) {
-        Iterable<Course> courses = courseAction.findAll();
-        model.addAttribute("courses", courses);
+        model.addAttribute("courses", getCourses());
         model.addAttribute("course", new Course());
         return "course";
     }
-    @PostMapping()
-    public String add(@ModelAttribute("course") Course course, Model model){
-        courseAction.save(course);
-        model.addAttribute("courses", courseAction.findAll());
-        return "course";
+
+    private Iterable<Course> getCourses() {
+        Iterable<Course> courses = courseAction.findAll();
+        return courses;
     }
-    @PostMapping("filter")
-    public String filter(@RequestParam String filter, Model model) {
-        model.addAttribute("filter", filter);
-        List<Course> courses = courseAction.findByTag(filter);
-        model.addAttribute("courses", courses);
-        return "course";
+
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PostMapping("/course")
+    public String add(@Valid Course newCourse,
+                      BindingResult bindingResult,
+                      Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("courses", getCourses());
+            return "course";
+        }
+        else {
+            courseAction.save(newCourse);
+        }
+        return "redirect:/course";
     }
 
 
-    @GetMapping("/{course}")
+    private List<Module> getCourseModules(@PathVariable Course course) {
+        return moduleAction.findModulesByCourseId(course.getId());
+    }
+
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @GetMapping("/course/{course}")
     public String showCourse(@PathVariable Course course, Model model) {
         model.addAttribute("course", course);
-        List<Module> modules = moduleAction.findModulesByCourseId(course.getId());
-        model.addAttribute("modules", modules);
+        model.addAttribute("modules", getCourseModules(course));
         Module module = new Module();
         model.addAttribute("module", module);
         return "module";
     }
-    
-    @PostMapping("/{course}")
-    public String addModule(@PathVariable Course course,
-                            @ModelAttribute("module") Module module,
-                            Model model){
-        course.setModule(module);
-        moduleAction.save(module);
-        List<Module> modules = moduleAction.findModulesByCourseId(course.getId());
-        model.addAttribute("modules", modules);
-        return "module";
 
+
+
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PostMapping("/saveCourse")
+    public String saveCourse(@RequestParam("id") Course course,
+                             @RequestParam String courseName,
+                             @RequestParam String tag,
+                             Model model) {
+//        if (bindingResult.hasErrors()){
+//            model.addAttribute("modules", getCourseModules(course));
+//            model.addAttribute("course", course);
+//            Module module = new Module();
+//            model.addAttribute("module", module);
+//            return "module";
+//        }
+//        else {
+            course.setName(courseName);
+            course.setTag(tag);
+            courseAction.save(course);
+            return "redirect:/course/"
+                    + course.getId();
+  //      }
     }
 
-    @GetMapping("/{course}/{module}")
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PostMapping("/deleteCourse")
+    public String deleteCourse(@RequestParam("id") Course course) {
+        courseAction.delete(course);
+        return "redirect:/course";
+    }
+
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PostMapping("/course/{course}")
+    public String addModule(@PathVariable Course course,
+                            @Valid Module module,
+                            BindingResult bindingResult,
+                            Model model) {
+        if (bindingResult.hasErrors()){
+            model.addAttribute("modules", getCourseModules(course));
+            model.addAttribute("course", course);
+            return "module";
+        }
+        else {
+            course.setModule(module);
+            moduleAction.save(module);
+            List<Module> modules = moduleAction.findModulesByCourseId(course.getId());
+            model.addAttribute("modules", modules);
+            return "redirect:/course/"
+                    + course.getId();
+        }
+    }
+
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PostMapping("/deleteModule")
+    public String deleteCourse(@RequestParam("id") Module module) {
+        moduleAction.delete(module);
+        return "redirect:/course/"
+                + module.getCourse().getId();
+    }
+
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @GetMapping("/course/{course}/{module}")
     public String showModule(@PathVariable Course course,
                              @PathVariable Module module,
                              Model model) {
@@ -77,14 +149,111 @@ public class CourseController {
         model.addAttribute("lesson", lesson);
         return "lesson";
     }
-    @PostMapping("/{course}/{module}")
-    public String addLesson(@PathVariable Course course,
-                            @PathVariable Module module,
-                            @ModelAttribute("lesson") Lesson lesson,
-                            Model model) {
-        module.setLesson(lesson);
-        lessonAction.save(lesson);
-        return "lesson";
+
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PostMapping("saveModule")
+    public String SaveModule(@RequestParam("id") Module module,
+                             @RequestParam String name) {
+        module.setName(name);
+        moduleAction.save(module);
+        return "redirect:/course/"
+                + module.getCourse().getId()
+                + "/"
+                + module.getId();
     }
 
+
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PostMapping("/course/{course}/{module}")
+    public String addLesson(@PathVariable Course course,
+                            @PathVariable Module module,
+                            @Valid Lesson lesson,
+                            BindingResult bindingResult,
+                            Model model) {
+        if (bindingResult.hasErrors()){
+            model.addAttribute("module", module);
+            model.addAttribute("lessons", lessonAction.findLessonsByModuleId(module.getId()));
+            return "lesson";
+        }
+        else {
+            module.setLesson(lesson);
+            lessonAction.save(lesson);
+            return "redirect:/course/"
+                    + lesson.getModule().getCourse().getId()
+                    + "/"
+                    + lesson.getModule().getId();
+        }
+    }
+
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PostMapping("/deleteLesson")
+    public String deleteLesson(@RequestParam("id") Lesson lesson){
+        lessonAction.delete(lesson);
+        return "redirect:/course/"
+                + lesson.getModule().getCourse().getId()
+                + "/"
+                + lesson.getModule().getId();
+    }
+
+
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @GetMapping("/course/{course}/{module}/{lesson}")
+    public String showLesson(@PathVariable Course course,
+                             @PathVariable Module module,
+                             @PathVariable Lesson lesson,
+                             Model model) {
+        model.addAttribute("crs", course);
+        model.addAttribute("md", module);
+        model.addAttribute("lssn", lesson);
+        return "aboutLesson";
+    }
+
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PostMapping("/saveLesson")
+    public String saveLesson(@RequestParam("id") Lesson lesson,
+                             @RequestParam String name,
+                             @RequestParam String lesson_header,
+                             @RequestParam String lesson_text,
+                             @RequestParam("link") String lesson_video) {
+        lesson.setName(name);
+        if (lesson_header.isEmpty()) {
+            lesson.setLesson_header(null);
+        } else {
+            lesson.setLesson_header(lesson_header);
+        }
+        if (lesson_text.isEmpty()) {
+            lesson.setLesson_text(null);
+        } else {
+            lesson.setLesson_text(lesson_text);
+        }
+        if (lesson_video.isEmpty()) {
+            lesson.setLesson_video(null);
+        } else {
+            lesson.setLesson_video(lesson_video);
+        }
+        lessonAction.save(lesson);
+        return "redirect:/course/" + lesson.getModule().getCourse().getId()
+                + "/"
+                + lesson.getModule().getId();
+    }
+
+    @GetMapping("/course/view/{course}")
+    public String viewCourse(@PathVariable Course course,
+                             @AuthenticationPrincipal User user,
+                             Model model) {
+        model.addAttribute("cs", course);
+        List<Long> CoursesIDs = user
+                .getSubscriptions()
+                .stream()
+                .collect(Collectors.toList())
+                .stream()
+                .map(Course::getId)
+                .collect(Collectors.toList());
+        if (CoursesIDs.contains(course.getId())) {
+            model.addAttribute("crs", course);
+            return "courseview";
+        } else {
+            return "errorpage";
+        }
+    }
 }
