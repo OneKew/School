@@ -1,4 +1,4 @@
-package com.example.school.service;
+package com.example.school.service; //Необходимые импорты
 
 import com.example.school.actions.CourseAction;
 import com.example.school.actions.UserAction;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
-    private final UserAction userAction;
+    private final UserAction userAction; //Используемые инжекты
     private final CourseAction courseAction;
     private final PasswordEncoder passwordEncoder;
 
@@ -28,20 +28,20 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Override
+    @Override //Поиск пользователя по логину
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userAction.findByUsername(username);
     }
 
     public List<User> findAllUsers() {
         return userAction.findAll();
-    }
+    } //список со всеми пользователями
 
     public List<Course> findAllCourses() {
         return courseAction.findAll();
-    }
+    } //список со всеми курсами
 
-    public boolean addUser(User user, UserInfo userInfo){
+    public boolean addUser(User user, UserInfo userInfo){ //создание пользователя и проверка наличия такого логина в БД
         User userFromDb = userAction.findByUsername(user.getUsername());
         if (userFromDb != null){
             return false;
@@ -56,7 +56,7 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void saveUser(User user, String username, Map<String, String> form) {
+    public void saveUser(User user, String username, Map<String, String> form) { //изменение ролей пользователя
         user.setUsername(username);
         Set<String> roles = Arrays.stream(Role.values())
                 .map(Role::name)
@@ -71,8 +71,7 @@ public class UserService implements UserDetailsService {
         }
 
 
-    public void updateProfile(User user,
-          //                    String password,
+    public void updateProfile(User user,            //Обновление личных данных в личном кабинете
                               String email,
                               String firstName,
                               String secondName,
@@ -88,10 +87,6 @@ public class UserService implements UserDetailsService {
             user.getUserInfo().setEmail(email);
         }
 
-//        if (!StringUtils.isEmpty(password)) {
-//            user.setPassword(passwordEncoder.encode(user.getPassword()));
-//        }
-
         user.getUserInfo().setFirst_name(firstName);
         user.getUserInfo().setSecond_name(secondName);
         user.getUserInfo().setSurname(surname);
@@ -100,7 +95,7 @@ public class UserService implements UserDetailsService {
         userAction.save(user);
     }
 
-    public void saveSubscriptions(User user, Map<String, Course> form) {
+    public void saveSubscriptions(User user, Map<String, Course> form) { //организация доступа на курсы пользователю
         Map<String, Course> courseMap = findAllCourses().
                 stream().
                 collect(Collectors.toMap(Course::getTag, Function.identity()));

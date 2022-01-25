@@ -55,7 +55,7 @@ public class UserController {
     }
     @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_ADMIN)")
     @PostMapping("/subs")
-    public String userSubsSave(
+    public String userSaveSubscriptions(
             @RequestParam Map<String, Course> form,
             @RequestParam("id") User user
     ) {

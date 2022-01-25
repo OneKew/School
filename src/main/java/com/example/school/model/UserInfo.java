@@ -19,8 +19,8 @@ public class UserInfo {
     @Column
     private String phone_number;
     @Column
-    @NotBlank(message = "Пожалуйста, введите почту.")
-    @Email(message = "Почта введена некорректно.")
+
+   // @Email(message = "Почта введена некорректно.")
     private String email;
     @Column
     private String birth_date;

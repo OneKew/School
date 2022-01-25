@@ -21,7 +21,6 @@ public class Course {
     @NotEmpty(message = "Пожалуйста, заполните поле")
     @Size(max = 5, message = "Тег должен быть уникальным, до 5 символов")
     private String tag;
-    private String  comments;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
     private List<Module> modules = new ArrayList<Module>();
@@ -81,11 +80,4 @@ public class Course {
         this.students = students;
     }
 
-    public String getComments() {
-        return comments;
-    }
-
-    public void setComments(String comments) {
-        this.comments = comments;
-    }
 }

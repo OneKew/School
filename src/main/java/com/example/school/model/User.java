@@ -1,11 +1,9 @@
 package com.example.school.model;
 
-import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
 import java.util.HashSet;
@@ -19,14 +17,11 @@ public class User implements UserDetails {
     @Column
     private Long id;
     @Column
-    @NotEmpty(message = "Пожалуйста, введите.")
+  //  @NotEmpty(message = "Пожалуйста, введите.")
     private String username;
     @Column
-    @NotEmpty(message = "Пожалуйста, заполните поле.")
+   // @NotEmpty(message = "Пожалуйста, заполните поле.")
     private String password;
-    @Transient
-    @NotBlank(message = "Повторите введеннный пароль.")
-    private String password_confirmation;
     @Column
     private boolean active;
     @OneToOne(cascade = CascadeType.ALL)
@@ -131,11 +126,11 @@ public class User implements UserDetails {
         this.userInfo = userInfo;
     }
 
-    public String getPassword_confirmation() {
-        return password_confirmation;
-    }
-
-    public void setPassword_confirmation(String password_confirmation) {
-        this.password_confirmation = password_confirmation;
-    }
+//    public String getPassword_confirmation() {
+//        return password_confirmation;
+//    }
+//
+//    public void setPassword_confirmation(String password_confirmation) {
+//        this.password_confirmation = password_confirmation;
+//    }
 }

@@ -12,12 +12,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -35,7 +36,7 @@ public class CourseController {
         this.lessonAction = lessonAction;
     }
 
-    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)") // Переход на страницу курсов
     @GetMapping("/course")
     public String course(Model model) {
         model.addAttribute("courses", getCourses());
@@ -48,7 +49,7 @@ public class CourseController {
         return courses;
     }
 
-    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)") // Создание курса
     @PostMapping("/course")
     public String add(@Valid Course newCourse,
                       BindingResult bindingResult,
@@ -68,7 +69,7 @@ public class CourseController {
         return moduleAction.findModulesByCourseId(course.getId());
     }
 
-    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)") // отображение данных выбранного курса
     @GetMapping("/course/{course}")
     public String showCourse(@PathVariable Course course, Model model) {
         model.addAttribute("course", course);
@@ -80,20 +81,11 @@ public class CourseController {
 
 
 
-    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)") //Сохранение измененных данных курса
     @PostMapping("/saveCourse")
     public String saveCourse(@RequestParam("id") Course course,
                              @RequestParam String courseName,
-                             @RequestParam String tag,
-                             Model model) {
-//        if (bindingResult.hasErrors()){
-//            model.addAttribute("modules", getCourseModules(course));
-//            model.addAttribute("course", course);
-//            Module module = new Module();
-//            model.addAttribute("module", module);
-//            return "module";
-//        }
-//        else {
+                             @RequestParam String tag) {
             course.setName(courseName);
             course.setTag(tag);
             courseAction.save(course);
@@ -102,14 +94,14 @@ public class CourseController {
   //      }
     }
 
-    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)") // удаление курса
     @PostMapping("/deleteCourse")
     public String deleteCourse(@RequestParam("id") Course course) {
         courseAction.delete(course);
         return "redirect:/course";
     }
 
-    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)") // добавление модуля
     @PostMapping("/course/{course}")
     public String addModule(@PathVariable Course course,
                             @Valid Module module,
@@ -130,15 +122,15 @@ public class CourseController {
         }
     }
 
-    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)") // удаление модуля
     @PostMapping("/deleteModule")
-    public String deleteCourse(@RequestParam("id") Module module) {
+    public String deleteModule(@RequestParam("id") Module module) {
         moduleAction.delete(module);
         return "redirect:/course/"
                 + module.getCourse().getId();
     }
 
-    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)") // отображение данных модуля
     @GetMapping("/course/{course}/{module}")
     public String showModule(@PathVariable Course course,
                              @PathVariable Module module,
@@ -150,7 +142,7 @@ public class CourseController {
         return "lesson";
     }
 
-    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)") // сохранение измененных данных модуля
     @PostMapping("saveModule")
     public String SaveModule(@RequestParam("id") Module module,
                              @RequestParam String name) {
@@ -163,7 +155,7 @@ public class CourseController {
     }
 
 
-    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)") // добавление урока к модулю
     @PostMapping("/course/{course}/{module}")
     public String addLesson(@PathVariable Course course,
                             @PathVariable Module module,
@@ -185,7 +177,7 @@ public class CourseController {
         }
     }
 
-    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)") // удаление урока
     @PostMapping("/deleteLesson")
     public String deleteLesson(@RequestParam("id") Lesson lesson){
         lessonAction.delete(lesson);
@@ -196,7 +188,7 @@ public class CourseController {
     }
 
 
-    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)") // отображение данных урока
     @GetMapping("/course/{course}/{module}/{lesson}")
     public String showLesson(@PathVariable Course course,
                              @PathVariable Module module,
@@ -208,7 +200,7 @@ public class CourseController {
         return "aboutLesson";
     }
 
-    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)")
+    @PreAuthorize("hasRole(T(com.example.school.model.Role).ROLE_TEACHER)") // сохранение данных урока
     @PostMapping("/saveLesson")
     public String saveLesson(@RequestParam("id") Lesson lesson,
                              @RequestParam String name,
@@ -237,7 +229,7 @@ public class CourseController {
                 + lesson.getModule().getId();
     }
 
-    @GetMapping("/course/view/{course}")
+    @GetMapping("/course/view/{course}") // отображение всего выбранного курса
     public String viewCourse(@PathVariable Course course,
                              @AuthenticationPrincipal User user,
                              Model model) {
